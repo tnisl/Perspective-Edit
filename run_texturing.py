@@ -143,7 +143,7 @@ if __name__ == "__main__":
     subprocess.run(["wget",
                     "-q",
                     "--show-progress",
-                    "-O", CHECKPOINT_DIR,
+                    "-O", CHECKPOINT_DIR + "/" + "big-lama.pt",
                     "https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt"],
                    check=True)
 
