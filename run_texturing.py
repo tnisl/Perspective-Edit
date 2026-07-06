@@ -140,7 +140,12 @@ if __name__ == "__main__":
         filename='RealESRGAN_x2plus.pth', 
         local_dir='./mv_adapter/checkpoints')
     
-    subprocess.run(["wget", "-q", "--show-progress", "-O", CHECKPOINT_DIR, "https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt"])
+    subprocess.run(["wget",
+                    "-q",
+                    "--show-progress",
+                    "-O", CHECKPOINT_DIR,
+                    "https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt"],
+                   check=True)
 
 
     parser = argparse.ArgumentParser()
