@@ -17,8 +17,8 @@ if MV_ADAPTER_CODE_DIR not in sys.path:
 
 SCALE = 0.8
 
-from mvadapter.utils.render import NVDiffRastContextWrapper, load_mesh, render
-from mvadapter.utils import get_orthogonal_camera
+from mvadapter.utils.mesh_utils.render import NVDiffRastContextWrapper, load_mesh, render
+from mvadapter.utils.mesh_utils.camera import get_orthogonal_camera
 
 
 def rotate(mesh_path, angle):
