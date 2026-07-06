@@ -19,7 +19,7 @@ SCALE = 0.8
 
 from mvadapter.utils.mesh_utils.render import NVDiffRastContextWrapper, render
 from mvadapter.utils.mesh_utils.mesh import load_mesh
-from mvadapter.utils.mesh_utils.camra import get_orthogonal_camera
+from mvadapter.utils.mesh_utils.camera import get_orthogonal_camera
 
 
 def rotate(mesh_path, angle):
