@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 
-DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BASE_DIR = os.getcwd()
 MV_ADAPTER_CODE_DIR = os.path.join(BASE_DIR, "mv_adapter")
 if MV_ADAPTER_CODE_DIR not in sys.path:
@@ -27,7 +27,7 @@ def rotate(mesh_path, angle):
     print("Rendering new view")
 
     print("Initialize context (render)")
-    ctx = NVDiffRastContextWrapper(device = DEVICE, context_type = 'cuda')
+    ctx = NVDiffRastContextWrapper(device = DEVICE, context_type = DEVICE)
     
     print("Loading mesh")
     mesh = load_mesh(mesh_path, rescale = True, device = DEVICE)
@@ -38,6 +38,8 @@ def rotate(mesh_path, angle):
         elevation_deg=[0], azimuth_deg=[angle - 90],
         distance=[1.8], left=-0.55*SCALE, right=0.55*SCALE, bottom=-0.55*SCALE, top=0.55*SCALE, device=DEVICE
     )
+
+    print(camera)
     
     print("Rendering")
     
