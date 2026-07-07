@@ -170,7 +170,7 @@ def run(img_path, rotated_img_path, mask_path):
     # 1. Lấy kích thước hình học
     x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
     h_dst, w_dst = img.shape[:2]
-    cx, cy = int(center[0]), int(center[1])
+    cx, cy = int(c_bbox[0]), int(c_bbox[1])
     
     # 2. Tính toán vùng ảnh chịu tác động (ROI) khi đặt vào ảnh đích
     roi_x_start = cx - w // 2
