@@ -14,8 +14,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from blending_style_transfer import run_blending_style_transfer, download_vgg_model
 
+import argparse
 
-def main():
+
+def run(source_path, target_path, mask_path, style_path):
     # Download VGG model if not present
     print("Checking VGG model...")
     download_vgg_model()
@@ -23,43 +25,46 @@ def main():
     # Load the 4 required input images from Kaggle datasets
     print("\nLoading input images from Kaggle datasets...")
     
-    left_face_mask = Image.open('/kaggle/input/datasets/lctrnnguynkhi/material-images/left_face_mask.png')
-    left_face_mask_content = Image.open('/kaggle/input/datasets/lctrnnguynkhi/material-images/left_face_mask_content.png')
-    target_image = Image.open('/kaggle/input/datasets/cymeu4l0t/project-images/portrait.jpg')
-    style_image = Image.open('/kaggle/input/datasets/cymeu4l0t/project-images/style1.jpg')
-    
-    print(f"Mask size: {left_face_mask.size}")
-    print(f"Content size: {left_face_mask_content.size}")
-    print(f"Target size: {target_image.size}")
-    print(f"Style size: {style_image.size}")
+    source_img = Image.open(source_path)
+    target_img = Image.open(target_path)
+    mask = Image.open(mask_path)
+    style_img = Image.open(style_path)
+
+    print(f"Mask size: {mask.size}")
+    print(f"Source size: {source_img.size}")
+    print(f"Target size: {target_img.size}")
+    print(f"Style size: {style_img.size}")
     
     # Run the blending style transfer
     print("\nStarting blending style transfer...")
     result = run_blending_style_transfer(
-        source_img=left_face_mask_content,
-        mask_img=left_face_mask,
-        target_img=target_image,
-        style_img=style_image,
+        source_img=source_img,
+        mask_img=mask,
+        target_img=target,
+        style_img=style_img,
         num_steps=300,  # Adjust for quality vs speed tradeoff
         max_side=512
     )
     
     # Save and display result
     print("\nSaving result...")
-    result.save('result.jpg')
+    result.save('result.png')
     
-    # Display result
-    plt.figure(figsize=(12, 8))
-    plt.imshow(result)
-    plt.axis('off')
-    plt.title('Blending Style Transfer Result')
-    plt.tight_layout()
-    plt.savefig('result_preview.png', dpi=150, bbox_inches='tight')
-    print("Result saved to 'result.jpg' and 'result_preview.png'")
-    
-    # Optionally show the plot
-    plt.show()
+
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--source_path", type=str)
+    parser.add_argument("--target_path", type=str)
+    parser.add_argument("--mask_path", type=str)
+    parser.add_argument("--style_path", type=str)
+
+    args = parser.parse_args()
+
+    run(args.source_path, args.target_path, args.mask_path, args.style_path)
+
+
+
+
