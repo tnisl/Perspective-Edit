@@ -167,6 +167,18 @@ def run(img_path, rotated_img_path, mask_path):
     print(f"Debug only_face_result: {only_face_result.shape}")
 
     print(c_bbox)
+    # 1. Lấy kích thước hình học
+    x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
+    h_dst, w_dst = img.shape[:2]
+    cx, cy = int(center[0]), int(center[1])
+    
+    # 2. Tính toán vùng ảnh chịu tác động (ROI) khi đặt vào ảnh đích
+    roi_x_start = cx - w // 2
+    roi_y_start = cy - h // 2
+    roi_x_end = roi_x_start + w
+    roi_y_end = roi_y_start + h
+
+    print(roi_x_start, roi_y_start, roi_x_end, roi_y_end)
     
     print("Creating final seamless blend...")
 
