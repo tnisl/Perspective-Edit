@@ -59,13 +59,20 @@ def run(img_path, rotated_img_path, mask_path):
     # Load images
     img = cv2.imread(img_path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    print(f"Debug rotated: {img.shape}")
     
     rotated_img = cv2.imread(rotated_img_path)
     rotated_img = cv2.cvtColor(rotated_img, cv2.COLOR_BGR2RGB)
     rotated_img = cv2.resize(rotated_img, (img.shape[0], img.shape[1]))
+
+    print(f"Debug rotated: {rotated_img.shape}")
+    
     
     mask = cv2.imread(mask_path)
     mask = cv2.resize(mask, (1024, 1024))
+
+    print(f"Debug mask: {mask.shape}")
+    
     
     # Detect landmarks
     preds = facial_landmark(img, fa)
