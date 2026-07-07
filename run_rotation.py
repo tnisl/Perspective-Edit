@@ -55,7 +55,7 @@ def rotate(mesh_path, output_path, angle):
                 break
     
     img_3d = (np.clip(color_tensor[0].cpu().numpy(), 0.0, 1.0) * 255).astype(np.uint8)
-    cv2.imwrite(output_path, img_3d)
+    cv2.imwrite(output_path, cv2.cvtColor(img_3d, cv2.COLOR_RGB2BGR))
     print("Done!")
 
 
