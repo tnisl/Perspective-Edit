@@ -186,7 +186,7 @@ def run(img_path, rotated_img_path, mask_path):
     result = cv2.seamlessClone(
         rotated_img,
         img,
-        moved_mask,
+        moved_mask_float.astype(np.uint8),
         (int(moved_center[0]), int(moved_center[1])),
         cv2.NORMAL_CLONE
     )
