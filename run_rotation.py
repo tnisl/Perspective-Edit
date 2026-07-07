@@ -22,7 +22,7 @@ from mvadapter.utils.mesh_utils.mesh import load_mesh
 from mvadapter.utils.mesh_utils.camera import get_orthogonal_camera
 
 
-def rotate(mesh_path, angle):
+def rotate(mesh_path, output_path, angle):
     print("="*10)
     print("Rendering new view")
 
@@ -55,7 +55,7 @@ def rotate(mesh_path, angle):
                 break
     
     img_3d = (np.clip(color_tensor[0].cpu().numpy(), 0.0, 1.0) * 255).astype(np.uint8)
-    cv2.imwrite('rotated_img.png', img_3d)
+    cv2.imwrite(output_path, img_3d)
     print("Done!")
 
 
@@ -64,11 +64,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--mesh_path", type=str)
+    parser.add_argument("--output_path", type=str)
     parser.add_argument("--angle", type=float)
 
     args = parser.parse_args()
 
-    rotate(args.mesh_path, args.angle)
+    rotate(args.mesh_path, args.output_path, args.angle)
 
 
 
