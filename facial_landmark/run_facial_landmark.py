@@ -186,12 +186,12 @@ def run(img_path, rotated_img_path, mask_path):
     result = cv2.seamlessClone(
         rotated_img,
         img,
-        moved_mask_float.astype(np.uint8),
+        moved_mask,
         (int(moved_center[0]), int(moved_center[1])),
         cv2.NORMAL_CLONE
     )
 
-    cv2.imwrite('materials/poisson_blending_result.png', result)
+    cv2.imwrite('materials/poisson_blending_result.png', cv2.cvtColor(result, cv2.COLOR_RGB2BGR))
     content_mask = (rotated_img * moved_mask_float).astype(np.uint8)
 
     moved_content_mask = cv2.warpAffine(content_mask, reverse_matrix, (1024, 1024), borderValue=(0, 0, 0))
