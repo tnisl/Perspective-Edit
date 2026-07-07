@@ -112,11 +112,14 @@ def run(img_path, rotated_img_path, mask_path):
     reverse_matrix = np.float32([[1, 0, -vector[0]],
                                  [0, 1, -vector[1]]])
     
+    moved_mask = cv2.warpAffine(mask, translation_matrix, (1024, 1024), borderValue=(0, 0, 0)) / 255
+
+    
     # Calculate bounding box for seamless clone
     if len(mask.shape) == 3:
-        mask_gray = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+        mask_gray = cv2.cvtColor(moved_mask, cv2.COLOR_BGR2GRAY)
     else:
-        mask_gray = mask.copy()
+        mask_gray = moved_mask.copy()
     
     if mask_gray.max() <= 1.0:
         mask_gray = (mask_gray * 255).astype(np.uint8)
@@ -124,65 +127,69 @@ def run(img_path, rotated_img_path, mask_path):
         mask_gray = mask_gray.astype(np.uint8)
     
     x, y, w, h = cv2.boundingRect(mask_gray)
-    c_bbox = (x + w // 2, y + h // 2)
-    
-    print("Loading BiSeNet model for face segmentation...")
-    
-    # Load BiSeNet model
-    net, device = load_bisenet_model(BISENET_WEIGHT_PATH)
-    
-    # Preprocessing transform
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-    ])
-    
-    print("Segmenting face...")
-    
-    # Read and prepare image for BiSeNet
-    img_rgb = cv2.imread(rotated_img_path)
-    img_rgb = cv2.resize(img_rgb, (HEIGHT, WIDTH))
-    h_orig, w_orig = img_rgb.shape[:2]
-    
-    img_rgb = cv2.resize(img_rgb, (512, 512))
-    tensor_img = transform(img_rgb).unsqueeze(0)
+    center = (x + w // 2, y + h // 2)
+
+    moved_center = (center[0] - vector[0], center[1] - vector[1])
+
 
     
-    # Run BiSeNet inference
-    tensor_img = tensor_img.to(device)
-    
-    with torch.no_grad():
-        output = net(tensor_img)[0]
-        parsing_mask = output.squeeze(0).argmax(0).cpu().numpy()
-    
-    # Extract face labels
-    face_ids = [1, 2, 3, 4, 5, 10, 11, 12, 13]
-    pure_face_mask = np.isin(parsing_mask, face_ids).astype(np.uint8) * 255
-    pure_face_mask_orig = cv2.resize(pure_face_mask, (w_orig, h_orig))
-    
-    mask_3ch = np.repeat(pure_face_mask_orig[:, :, np.newaxis], 3, axis=2) / 255.0
-    only_face_result = (rotated_img * mask_3ch).astype(np.uint8)
+    #print("Loading BiSeNet model for face segmentation...")
+    #
+    ## Load BiSeNet model
+    #net, device = load_bisenet_model(BISENET_WEIGHT_PATH)
+    #
+    ## Preprocessing transform
+    #transform = transforms.Compose([
+    #    transforms.ToTensor(),
+    #    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+    #])
+    #
+    #print("Segmenting face...")
+    #
+    ## Read and prepare image for BiSeNet
+    #img_rgb = cv2.imread(rotated_img_path)
+    #img_rgb = cv2.resize(img_rgb, (HEIGHT, WIDTH))
+    #h_orig, w_orig = img_rgb.shape[:2]
+    #
+    #img_rgb = cv2.resize(img_rgb, (512, 512))
+    #tensor_img = transform(img_rgb).unsqueeze(0)
 
-    print(f"Debug only_face_result: {only_face_result.shape}")
+    #
+    ## Run BiSeNet inference
+    #tensor_img = tensor_img.to(device)
+    #
+    #with torch.no_grad():
+    #    output = net(tensor_img)[0]
+    #    parsing_mask = output.squeeze(0).argmax(0).cpu().numpy()
+    #
+    ## Extract face labels
+    #face_ids = [1, 2, 3, 4, 5, 10, 11, 12, 13]
+    #pure_face_mask = np.isin(parsing_mask, face_ids).astype(np.uint8) * 255
+    #pure_face_mask_orig = cv2.resize(pure_face_mask, (w_orig, h_orig))
+    #
+    #mask_3ch = np.repeat(pure_face_mask_orig[:, :, np.newaxis], 3, axis=2) / 255.0
+    #only_face_result = (rotated_img * mask_3ch).astype(np.uint8)
 
-    print(c_bbox)
+    #print(f"Debug only_face_result: {only_face_result.shape}")
 
-    print("Creating final seamless blend...")
+    #print(c_bbox)
 
-    cv2.imwrite("debug_only_face_result.png", only_face_result)
+    #print("Creating final seamless blend...")
 
-    x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
-    h_dst, w_dst = img.shape[:2]
+    #cv2.imwrite("debug_only_face_result.png", only_face_result)
 
-    safe_cx = int(np.clip(c_bbox[0], w // 2 + 1, w_dst - w // 2 - 1))
-    safe_cy = int(np.clip(c_bbox[1], h // 2 + 1, h_dst - h // 2 - 1))
+    #x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
+    #h_dst, w_dst = img.shape[:2]
+
+    #safe_cx = int(np.clip(c_bbox[0], w // 2 + 1, w_dst - w // 2 - 1))
+    #safe_cy = int(np.clip(c_bbox[1], h // 2 + 1, h_dst - h // 2 - 1))
     
     # Final seamless clone with segmented face
     result = cv2.seamlessClone(
         rotated_img,
         img,
-        pure_face_mask_orig,
-        (safe_cx, safe_cy),
+        moved_mask,
+        (int(moved_center[0]), int(moved_center[1])),
         cv2.NORMAL_CLONE
     )
 
