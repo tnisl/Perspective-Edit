@@ -50,7 +50,7 @@ def load_bisenet_model(weight_path='79999_iter.pth'):
 
 
 
-def facial_landmark(img_path, rotated_img_path, mask_path):
+def run(img_path, rotated_img_path, mask_path):
     print("Loading images and detecting landmarks...")
     
     # Initialize face alignment
@@ -197,6 +197,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    facial_landmark(args.img_path, args.rotated_img_path, args.mask_path)
+    run(args.img_path, args.rotated_img_path, args.mask_path)
 
     
