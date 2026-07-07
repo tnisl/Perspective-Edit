@@ -196,7 +196,7 @@ def run(img_path, rotated_img_path, mask_path):
 
     moved_content_mask = cv2.warpAffine(content_mask, reverse_matrix, (1024, 1024), borderValue=(0, 0, 0))
 
-    cv2.imwrite('materials/moved_content_mask.png', moved_content_mask)
+    cv2.imwrite('materials/moved_content_mask.png', cv2.cvtColor(moved_content_mask, cv2.COLOR_RGB2BGR))
 
 
 
