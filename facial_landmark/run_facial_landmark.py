@@ -167,29 +167,23 @@ def run(img_path, rotated_img_path, mask_path):
     print(f"Debug only_face_result: {only_face_result.shape}")
 
     print(c_bbox)
-    # 1. Lấy kích thước hình học
-    x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
-    h_dst, w_dst = img.shape[:2]
-    cx, cy = int(c_bbox[0]), int(c_bbox[1])
-    
-    # 2. Tính toán vùng ảnh chịu tác động (ROI) khi đặt vào ảnh đích
-    roi_x_start = cx - w // 2
-    roi_y_start = cy - h // 2
-    roi_x_end = roi_x_start + w
-    roi_y_end = roi_y_start + h
 
-    print(roi_x_start, roi_y_start, roi_x_end, roi_y_end)
-    
     print("Creating final seamless blend...")
 
     cv2.imwrite("debug_pur_face_mask_orig.png", pure_face_mask_orig)
+
+    x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
+    h_dst, w_dst = img.shape[:2]
+
+    safe_cx = int(np.clip(c_bbox[0], w // 2 + 1, w_dst - w // 2 - 1))
+    safe_cy = int(np.clip(c_bbox[1], h // 2 + 1, h_dst - h // 2 - 1))
     
     # Final seamless clone with segmented face
     result = cv2.seamlessClone(
         rotated_img,
         img,
         pure_face_mask_orig,
-        (int(c_bbox[0]), int(c_bbox[1])),
+        (safe_cx, safe_cy),
         cv2.NORMAL_CLONE
     )
 
