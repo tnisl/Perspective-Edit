@@ -148,6 +148,8 @@ def run(img_path, rotated_img_path, mask_path):
     img_resized = cv2.resize(img_bgr, (512, 512))
     img_rgb = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB)
     tensor_img = transform(img_rgb).unsqueeze(0)
+
+    im.imwrite('img_rgb.png', img_rgb)
     
     # Run BiSeNet inference
     tensor_img = tensor_img.to(device)
