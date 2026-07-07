@@ -64,7 +64,6 @@ def run(img_path, rotated_img_path, mask_path):
     print(f"Debug rotated: {img.shape}")
     
     rotated_img = cv2.imread(rotated_img_path)
-    rotated_img = cv2.cvtColor(rotated_img, cv2.COLOR_BGR2RGB)
     rotated_img = cv2.resize(rotated_img, (HEIGHT, WIDTH))
 
     print(f"Debug rotated: {rotated_img.shape}")
@@ -162,7 +161,7 @@ def run(img_path, rotated_img_path, mask_path):
     pure_face_mask_orig = cv2.resize(pure_face_mask, (w_orig, h_orig))
     
     mask_3ch = np.repeat(pure_face_mask_orig[:, :, np.newaxis], 3, axis=2) / 255.0
-    only_face_result = (img_rgb * mask_3ch).astype(np.uint8)
+    only_face_result = (rotated_img * mask_3ch).astype(np.uint8)
 
     print(f"Debug only_face_result: {only_face_result.shape}")
 
