@@ -20,3 +20,4 @@ timm
 kornia
 cvcuda_cu12
 gltflib
+face_alignment
