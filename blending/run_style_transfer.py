@@ -40,7 +40,7 @@ def run(source_path, target_path, mask_path, style_path):
     result = run_blending_style_transfer(
         source_img=source_img,
         mask_img=mask,
-        target_img=target,
+        target_img=target_img,
         style_img=style_img,
         num_steps=300,  # Adjust for quality vs speed tradeoff
         max_side=512
