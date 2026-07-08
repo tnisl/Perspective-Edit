@@ -60,18 +60,15 @@ def run(img_path, rotated_img_path, mask_path):
     img = cv2.imread(img_path)
     img = cv2.resize(img, (HEIGHT, WIDTH))
 
-    print(f"Debug rotated: {img.shape}")
     
     rotated_img = cv2.imread(rotated_img_path)
     rotated_img = cv2.resize(rotated_img, (HEIGHT, WIDTH))
 
-    print(f"Debug rotated: {rotated_img.shape}")
     
     
     mask = cv2.imread(mask_path)
     mask = cv2.resize(mask, (HEIGHT, WIDTH))
 
-    print(f"Debug mask: {mask.shape}")
     
     
     # Detect landmarks
