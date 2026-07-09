@@ -25,7 +25,7 @@ def extract_materials(editor_data):
     cv2.imwrite('materials/portrait.png', cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR))
 
 
-def run(editor_data, style_img,  deg):
+def run(editor_data, style_img,  deg, iters):
     extract_materials(editor_data)
     cv2.imwrite('materials/style_img.png', cv2.cvtColor(style_img, cv2.COLOR_RGB2BGR))
     subprocess.run([".venv/bin/python",
@@ -51,7 +51,7 @@ def run(editor_data, style_img,  deg):
                     "--target_path", "materials/portrait.png", 
                     "--mask_path", "materials/mask.png",
                     "--style_path", "materials/style_img.png", 
-                    "--iters", "2000"])
+                    "--iters", f"{iters}"])
     result=cv2.imread('result.png')
 
     return cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
@@ -84,6 +84,13 @@ with gr.Blocks() as demo:
                     step=1,
                     label="Azimuth"
                 )
+                iters=gr.Slider(
+                    minimum=0,
+                    maximum=10000,
+                    value=2000,
+                    step=1,
+                    label="Iterations"
+                )
 
             
         with gr.Column():
@@ -91,7 +98,7 @@ with gr.Blocks() as demo:
             
     btn_submit.click(
         fn=run, 
-        inputs=[input_editor, style_img, deg], 
+        inputs=[input_editor, style_img, deg, iters], 
         outputs=[output]
     )
 
