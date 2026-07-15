@@ -351,7 +351,7 @@ def run_style_transfer(
 
 
 
-    opt_img = (torch.randn(content_img.size(), device=DEVICE, dtype=content_img.dtype) * 1e-3).contiguous()
+    opt_img = (torch.randn(content_nst.size(), device=DEVICE, dtype=content_nst.dtype) * 1e-3).contiguous()
     opt_img.requires_grad_(True)
     optimizer = optim.LBFGS([opt_img])
 
