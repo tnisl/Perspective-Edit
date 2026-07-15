@@ -313,6 +313,94 @@ def history_to_plot(history: list[dict[str, float]]):
 # ============================================================================
 # Main Blending Style Transfer Function
 # ============================================================================
+def run_style_tranfer(
+        content_img: Image.Image,
+        style_img: Image.Image,
+        w_content: float=4.0,
+        w_style_total: float=1.0,
+        max_side: int = 512,
+        num_steps: int=1000,
+        vgg_model_path: str = "Models/vgg_conv.pth"
+):
+
+    content_img = resize_pil_long_side(content_img.convert("RGB"), max_side, mode="RGB")
+    style_img = resize_pil_long_side(style_img.convert("RGB"), max_side, mode="RGB").resize(
+        content_img.size, Image.BILINEAR
+    )
+
+    style_rgb01 = pil_to_rgb01_tensor(style_img)
+    content_rgb01 = pil_to_rgb01_tensor(content_img)
+
+    style_nst = rgb01_to_nst(style_rgb01)
+    content_nst = rgb01_to_nst(content_rgb01)
+
+    # Load VGG model
+    vgg = get_vgg_model(vgg_model_path)
+    gram_loss = GramMSELoss().to(DEVICE)
+    mse_loss = nn.MSELoss().to(DEVICE)
+
+    style_layer_weights = [1e3 / n**2 for n in [64, 128, 256, 512, 512]]
+
+
+    # Extract and freeze target features
+    with torch.no_grad():
+        style_targets = [GramMatrix()(A).detach() for A in vgg(style_nst, STYLE_LAYERS)]
+        content_targets = [A.detach() for A in vgg(content_nst, CONTENT_LAYERS)]
+        targets = style_targets + content_targets
+        targets = [t.to(DEVICE) for t in targets]
+
+
+
+    opt_img = (torch.randn(content_img.size(), device=DEVICE, dtype=content_img.dtype) * 1e-3).contiguous()
+    opt_img.requires_grad_(True)
+    optimizer = optim.LBFGS([opt_img])
+
+    n_iter = [0]
+    def closure():
+        optimizer.zero_grad()
+        out = vgg(opt_img, LOSS_LAYERS)
+        
+        # A. Style Loss
+        style_losses = [
+            style_layer_weights[i] * gram_loss(activation, targets[i])
+            for i, activation in enumerate(out[:len(STYLE_LAYERS)])
+        ]
+        loss_style = torch.stack(style_losses).sum()
+
+        # B. Content Loss
+        content_losses = [
+            w_content * mse_loss(activation, targets[len(STYLE_LAYERS) + i])
+            for i, activation in enumerate(out[len(STYLE_LAYERS):])
+        ]
+        loss_content = torch.stack(content_losses).sum()
+
+        # Total loss
+        loss = (
+            w_style_total * loss_style
+            + loss_content
+        )
+
+        loss.backward()
+        if opt_img.grad is not None:
+            opt_img.grad = opt_img.grad.contiguous()
+
+        n_iter[0] += 1
+        if n_iter[0] % 20 == 0 or n_iter[0] == 1:
+            print(f"Step {n_iter[0]:03d}/{num_steps} | Total: {loss.item():.4f} | "
+                  f"Style: {loss_style.item():.4f} | Content: {loss_content.item():.4f} | ")
+        return loss
+
+    # Run optimization
+    while n_iter[0] < num_steps:
+        optimizer.step(closure)
+
+    # 5. Convert result back to PIL image
+    gen_rgb01 = nst_to_rgb01(opt_img.detach(), clamp=True)
+    result_pil = rgb01_tensor_to_pil(gen_rgb01)
+    return result_pil
+
+
+
 
 def run_blending_style_transfer(
     source_img: Image.Image,
