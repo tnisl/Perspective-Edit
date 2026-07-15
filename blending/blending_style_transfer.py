@@ -313,7 +313,7 @@ def history_to_plot(history: list[dict[str, float]]):
 # ============================================================================
 # Main Blending Style Transfer Function
 # ============================================================================
-def run_style_tranfer(
+def run_style_transfer(
         content_img: Image.Image,
         style_img: Image.Image,
         w_content: float=4.0,
