@@ -25,9 +25,9 @@ def extract_materials(editor_data):
     cv2.imwrite('materials/portrait.png', cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR))
 
 
-def run(editor_data, style_img,  azimuth, elevation, iters):
+def export_3d(editor_data):
     extract_materials(editor_data)
-    cv2.imwrite('materials/style_img.png', cv2.cvtColor(style_img, cv2.COLOR_RGB2BGR))
+
     subprocess.run([".venv/bin/python",
                     "3d_scripts/inference_triposg.py",
                     "--image-input", "materials/portrait.png",
@@ -37,6 +37,13 @@ def run(editor_data, style_img,  azimuth, elevation, iters):
                    "--img_path", "materials/portrait.png",
                    "--mesh_path", "materials/object.glb",
                    "--output_path", "materials"])
+
+
+
+
+def run(editor_data, style_img,  azimuth, elevation, iters):
+    extract_materials(editor_data)
+    cv2.imwrite('materials/style_img.png', cv2.cvtColor(style_img, cv2.COLOR_RGB2BGR))
     subprocess.run([".venv/bin/python",
                    "run_rotation.py",
                    "--mesh_path", "materials/mvadapter_model_result.glb",
@@ -83,6 +90,7 @@ with gr.Blocks() as demo:
                     type="numpy",
                     sources=["upload", "clipboard"]
                 )
+            btn_export3d = gr.Button("Export 3D", variant="primary")
             btn_submit = gr.Button("Run", variant="primary")
 
             with gr.Column():
@@ -113,6 +121,10 @@ with gr.Blocks() as demo:
         with gr.Column():
             output = gr.Image(label="Result")
             
+    btn_export3d.click(
+        fn=export_3d,
+        inputs=[input_editor]
+    )
     btn_submit.click(
         fn=run, 
         inputs=[input_editor, style_img, azimuth, elevation, iters], 
