@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("--blend_path", type=str)
     parser.add_argument("--style_path", type=str)
     parser.add_argument("--w_content", type=float, default=8.0)
-    parser.add_argument("--w_content", type=float, default=1.0)
+    parser.add_argument("--w_style", type=float, default=1.0)
     parser.add_argument("--iters", type=int, default=300)
 
     args = parser.parse_args()
