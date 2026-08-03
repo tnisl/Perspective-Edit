@@ -38,6 +38,8 @@ def export_3d(editor_data):
                    "--mesh_path", "materials/object.glb",
                    "--output_path", "materials"])
 
+    return "materials/mvadapter_model_result.glb"
+
 
 
 
@@ -119,11 +121,13 @@ with gr.Blocks() as demo:
 
             
         with gr.Column():
+            object_3d = gr.Model3D(label="3D portrait", clear_color=[0.8, 0.8, 0.8, 1.0])
             output = gr.Image(label="Result")
             
     btn_export3d.click(
         fn=export_3d,
-        inputs=[input_editor]
+        inputs=[input_editor],
+        outputs=[object_3d]
     )
     btn_submit.click(
         fn=run, 
