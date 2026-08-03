@@ -47,6 +47,7 @@ def run(editor_data, style_img,  azimuth, elevation, iters):
                     "--img_path", "materials/portrait.png",
                     "--rotated_img_path", "materials/rotated_img.png",
                     "--mask_path", "materials/mask.png"])
+   # blending + style transfer
    # subprocess.run([".venv/bin/python", "blending/run_blending_style_transfer.py",
    #                 "--source_path", "materials/moved_content_mask.png",
    #                 "--target_path", "materials/portrait.png", 
@@ -54,7 +55,7 @@ def run(editor_data, style_img,  azimuth, elevation, iters):
    #                 "--style_path", "materials/style_img.png", 
    #                 "--iters", f"{iters}"])
 
-
+    # style transfer only
     subprocess.run([".venv/bin/python", "blending/run_style_transfer.py",
                     "--blend_path", "materials/moved_content_mask.png",
                     "--style_path", "materials/style_img.png", 
