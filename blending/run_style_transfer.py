@@ -59,7 +59,8 @@ def run(blend_path, style_path, w_content, w_style, iters):
     )
     
     # "face id" is not supported yet.
-    ip_model = IPAdapter(pipe, ip_ckpt, device, num_tokens=16)
+    # Based on IP-Adapter library, constructor is: IPAdapter(pipe, image_encoder_path, ip_ckpt, device)
+    ip_model = IPAdapter(pipe, "openai/clip-vit-large-patch14", ip_ckpt, device)
     
     images = ip_model.generate(pil_image=style_img, num_samples=1, image=blend_img, strength=w_style, scale=w_content, num_inference_steps=iters, seed=42)
     
