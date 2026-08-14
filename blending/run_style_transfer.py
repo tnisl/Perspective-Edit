@@ -44,8 +44,8 @@ def run(blend_path, style_path, w_content, w_style, iters):
     # Download IP-Adapter checkpoint if not present
     if not os.path.exists(ip_ckpt):
         print(f"Downloading IP-Adapter checkpoint: {ip_ckpt}")
-        hf_hub_download(repo_id="h94/IP-Adapter", filename="models/ip-adapter_sd15.bin", repo_type="model", local_dir=".")
-        print("Download complete.")
+        ip_ckpt = hf_hub_download(repo_id="h94/IP-Adapter", filename="models/ip-adapter_sd15.bin", repo_type="model")
+        print(f"Download complete. File saved to: {ip_ckpt}")
     
     noise_scheduler = DDIMScheduler(
         num_train_timesteps=1000,
