@@ -41,15 +41,15 @@ def run(blend_path, style_path, w_content, w_style, iters):
     ip_ckpt = "ip-adapter_sd15.bin"
     device = "cuda"
     
-    # Download IP-Adapter checkpoint and image encoder
-    print("Downloading IP-Adapter models...")
+    # Download IP-Adapter checkpoint
+    print("Downloading IP-Adapter checkpoint...")
     if not os.path.exists(ip_ckpt):
         ip_ckpt = hf_hub_download(repo_id="h94/IP-Adapter", filename="models/ip-adapter_sd15.bin", repo_type="model")
         print(f"IP-Adapter checkpoint downloaded to: {ip_ckpt}")
     
-    # Download the correct image encoder for SD1.5
-    image_encoder_path = hf_hub_download(repo_id="h94/IP-Adapter", filename="models/image_encoder/model.safetensors", repo_type="model")
-    print(f"Image encoder downloaded to: {image_encoder_path}")
+    # Use CLIP-ViT-H-14 which has 1024 dimensions to match the IP-Adapter checkpoint
+    image_encoder_path = "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
+    print(f"Using image encoder: {image_encoder_path}")
     
     noise_scheduler = DDIMScheduler(
         num_train_timesteps=1000,
@@ -74,7 +74,12 @@ def run(blend_path, style_path, w_content, w_style, iters):
     # Based on IP-Adapter library, constructor is: IPAdapter(pipe, image_encoder_path, ip_ckpt, device)
     ip_model = IPAdapter(pipe, image_encoder_path, ip_ckpt, device)
     
-    images = ip_model.generate(pil_image=style_img, num_samples=1, image=blend_img, strength=w_style, scale=w_content, num_inference_steps=iters, seed=42)
+    # Generate image with IP-Adapter
+    # - pil_image: reference/style image
+    # - image: content/base image for img2img
+    # - scale: IP-Adapter influence (how much style to apply)
+    # - strength: img2img strength (how much content to preserve, higher = less change)
+    images = ip_model.generate(pil_image=style_img, num_samples=1, image=blend_img, scale=w_style, strength=w_content, num_inference_steps=iters, seed=42)
     
     # Save and display result
     print("\nSaving result...")
