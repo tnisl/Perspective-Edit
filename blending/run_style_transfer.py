@@ -8,6 +8,7 @@ This script demonstrates how to use the 4 required input variables:
 - style_image: Style reference image
 """
 
+import os
 import matplotlib
 matplotlib.use("Agg")
 
@@ -16,6 +17,7 @@ import matplotlib.pyplot as plt
 import torch
 from diffusers import StableDiffusionPipeline, DDIMScheduler, AutoencoderKL
 from ip_adapter.ip_adapter import IPAdapter
+from huggingface_hub import hf_hub_download
 
 import argparse
 
@@ -38,6 +40,12 @@ def run(blend_path, style_path, w_content, w_style, iters):
     vae_model_path = "stabilityai/sd-vae-ft-mse"
     ip_ckpt = "ip-adapter_sd15.bin"
     device = "cuda"
+    
+    # Download IP-Adapter checkpoint if not present
+    if not os.path.exists(ip_ckpt):
+        print(f"Downloading IP-Adapter checkpoint: {ip_ckpt}")
+        hf_hub_download(repo_id="h94/IP-Adapter", filename="models/ip-adapter_sd15.bin", repo_type="model", local_dir=".")
+        print("Download complete.")
     
     noise_scheduler = DDIMScheduler(
         num_train_timesteps=1000,
