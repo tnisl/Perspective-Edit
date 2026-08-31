@@ -71,7 +71,7 @@ def prepare_pipeline(
         pipe.load_lora_weights(model_, weight_name=name_)
 
     # vae slicing for lower memory usage
-    pipe.enable_vae_slicing()
+    pipe.vae.enable_slicing()
 
     return pipe
 
