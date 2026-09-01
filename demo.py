@@ -65,14 +65,14 @@ def run(editor_data, style_img,  azimuth, elevation, iters):
    #                 "--iters", f"{iters}"])
 
     # style transfer only
-    subprocess.run([".venv/bin/python", "blending/run_style_transfer.py",
-                    "--blend_path", "materials/poisson_blending_result.png",
-                    "--style_path", "materials/style_img.png", 
-                    "--iters", f"{iters}"])
+    # subprocess.run([".venv/bin/python", "blending/run_style_transfer.py",
+    #                 "--blend_path", "materials/poisson_blending_result.png",
+    #                 "--style_path", "materials/style_img.png", 
+    #                 "--iters", f"{iters}"])
 
-    result=cv2.imread('result.png')
+    # result=cv2.imread('result.png')
 
-    return cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+    # return cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
 
 with gr.Blocks() as demo:
     gr.Markdown("Perspective Edit")
