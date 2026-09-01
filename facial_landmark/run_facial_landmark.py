@@ -193,7 +193,7 @@ def run(img_path, rotated_img_path, mask_path):
 
     cv2.imwrite('materials/moved_content_mask.png', moved_content_mask)
 
-
+    return translation_matrix
 
 
 
