@@ -139,7 +139,7 @@ def run(img_path, rotated_img_path, mask_path):
     cv2.imwrite('materials/poisson_blending_result.png', result)
     content_mask = (rotated_img * moved_mask_float).astype(np.uint8)
 
-    moved_content_mask = cv2.warpAffine(content_mask, reverse_matrix, (1024, 1024), borderValue=(0, 0, 0))
+    moved_content_mask = cv2.warpAffine(content_mask, reverse_matrix, (WIDTH, HEIGHT), borderValue=(0, 0, 0))
 
     cv2.imwrite('materials/moved_content_mask.png', moved_content_mask)
 
