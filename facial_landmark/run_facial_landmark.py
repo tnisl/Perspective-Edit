@@ -20,6 +20,7 @@ import face_alignment
 import torch
 import torchvision.transforms as transforms
 import argparse
+import json
 
 # Disable torch.compile for compatibility
 torch.compile = lambda model, *args, **kwargs: model
@@ -58,16 +59,16 @@ def run(img_path, rotated_img_path, mask_path):
     
     # Load images
     img = cv2.imread(img_path)
-    img = cv2.resize(img, (HEIGHT, WIDTH))
+    img = cv2.resize(img, (WIDTH, HEIGHT))
 
     
     rotated_img = cv2.imread(rotated_img_path)
-    rotated_img = cv2.resize(rotated_img, (HEIGHT, WIDTH))
+    rotated_img = cv2.resize(rotated_img, (WIDTH, HEIGHT))
 
     
     
     mask = cv2.imread(mask_path)
-    mask = cv2.resize(mask, (HEIGHT, WIDTH))
+    mask = cv2.resize(mask, (WIDTH, HEIGHT))
 
     
     
@@ -81,7 +82,7 @@ def run(img_path, rotated_img_path, mask_path):
     bucket = []
     for i, pts in enumerate(preds[0]):
         x, y = int(pts[0]), int(pts[1])
-        if y <= mask.shape[0] and x <= mask.shape[1] and mask[y, x, 0] != 0:
+        if y < mask.shape[0] and x < mask.shape[1] and mask[y, x, 0] != 0:
             bucket.append([x, y])
     
     bucket = np.array(bucket)
@@ -91,7 +92,7 @@ def run(img_path, rotated_img_path, mask_path):
     bucket = []
     for i, pts in enumerate(preds[0]):
         x, y = int(pts[0]), int(pts[1])
-        if y <= mask.shape[0] and x <= mask.shape[1] and mask[y, x, 0] != 0:
+        if y < mask.shape[0] and x < mask.shape[1] and mask[y, x, 0] != 0:
             dx, dy = int(rotated_preds[0][i][0]), int(rotated_preds[0][i][1])
             bucket.append([dx, dy])
     
@@ -124,58 +125,7 @@ def run(img_path, rotated_img_path, mask_path):
 
     moved_center = (center[0] - vector[0], center[1] - vector[1])
 
-
     
-    #print("Loading BiSeNet model for face segmentation...")
-    #
-    ## Load BiSeNet model
-    #net, device = load_bisenet_model(BISENET_WEIGHT_PATH)
-    #
-    ## Preprocessing transform
-    #transform = transforms.Compose([
-    #    transforms.ToTensor(),
-    #    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-    #])
-    #
-    #print("Segmenting face...")
-    #
-    ## Read and prepare image for BiSeNet
-    #img_rgb = cv2.imread(rotated_img_path)
-    #img_rgb = cv2.resize(img_rgb, (HEIGHT, WIDTH))
-    #h_orig, w_orig = img_rgb.shape[:2]
-    #
-    #img_rgb = cv2.resize(img_rgb, (512, 512))
-    #tensor_img = transform(img_rgb).unsqueeze(0)
-
-    #
-    ## Run BiSeNet inference
-    #tensor_img = tensor_img.to(device)
-    #
-    #with torch.no_grad():
-    #    output = net(tensor_img)[0]
-    #    parsing_mask = output.squeeze(0).argmax(0).cpu().numpy()
-    #
-    ## Extract face labels
-    #face_ids = [1, 2, 3, 4, 5, 10, 11, 12, 13]
-    #pure_face_mask = np.isin(parsing_mask, face_ids).astype(np.uint8) * 255
-    #pure_face_mask_orig = cv2.resize(pure_face_mask, (w_orig, h_orig))
-    #
-    #mask_3ch = np.repeat(pure_face_mask_orig[:, :, np.newaxis], 3, axis=2) / 255.0
-    #only_face_result = (rotated_img * mask_3ch).astype(np.uint8)
-
-    #print(f"Debug only_face_result: {only_face_result.shape}")
-
-    #print(c_bbox)
-
-    #print("Creating final seamless blend...")
-
-    #cv2.imwrite("debug_only_face_result.png", only_face_result)
-
-    #x, y, w, h = cv2.boundingRect(pure_face_mask_orig)
-    #h_dst, w_dst = img.shape[:2]
-
-    #safe_cx = int(np.clip(c_bbox[0], w // 2 + 1, w_dst - w // 2 - 1))
-    #safe_cy = int(np.clip(c_bbox[1], h // 2 + 1, h_dst - h // 2 - 1))
     
     # Final seamless clone with segmented face
     result = cv2.seamlessClone(
@@ -193,7 +143,13 @@ def run(img_path, rotated_img_path, mask_path):
 
     cv2.imwrite('materials/moved_content_mask.png', moved_content_mask)
 
-    return translation_matrix
+    data = {
+        "translation_matrix": translation_matrix.tolist(),
+        "reverse_matrix": reverse_matrix.tolist()
+    }
+    with open("materials/vector.json", "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
 
 
 
