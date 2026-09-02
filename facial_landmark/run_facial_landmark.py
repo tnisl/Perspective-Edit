@@ -109,7 +109,7 @@ def run(img_path, rotated_img_path, mask_path):
     reverse_matrix = np.float32([[1, 0, -vector[0]],
                                  [0, 1, -vector[1]]])
     
-    moved_mask = cv2.warpAffine(mask, translation_matrix, (1024, 1024), borderValue=(0, 0, 0))
+    moved_mask = cv2.warpAffine(mask, translation_matrix, (WIDTH, HEIGHT), borderValue=(0, 0, 0))
 
     moved_mask_float = moved_mask.astype(np.float32) / 255.0
 
