@@ -27,7 +27,7 @@ torch.compile = lambda model, *args, **kwargs: model
 
 from model import BiSeNet
 
-HEIGHT, WIDTH = 1024, 1024
+HEIGHT, WIDTH = 512, 512
 
 BISENET_WEIGHT_PATH = 'facial_landmark/79999_iter.pth'
 
