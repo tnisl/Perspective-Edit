@@ -22,3 +22,5 @@ Install the requirements:
 pip install -r requirements.txt
 ```
 
+NOTE: `TripoSG` and its build in texturing model had been optimized for dual gpu (especially when run on `Kaggle`).
+
