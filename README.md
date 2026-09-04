@@ -12,7 +12,7 @@ pip install diso --no-build-isolation
 pip install -p .venv git+https://github.com/NVlabs/nvdiffrast.git --no-build-isolation
 ```
 
-Install 'spandrel':
+Install `spandrel`:
 ```bash
 pip install spandrel==0.4.1 --no-deps
 ```
@@ -21,4 +21,6 @@ Install the requirements:
 ```bash
 pip install -r requirements.txt
 ```
+
+NOTE: `TripoSG` and its build in texturing model had been optimized for dual gpu (especially when run on `Kaggle`).
 

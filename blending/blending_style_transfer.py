@@ -311,7 +311,7 @@ def history_to_plot(history: list[dict[str, float]]):
 
 
 # ============================================================================
-# Main Blending Style Transfer Function
+# Main Style Transfer Function
 # ============================================================================
 def run_style_transfer(
         content_img: Image.Image,
@@ -351,7 +351,8 @@ def run_style_transfer(
 
 
 
-    opt_img = (torch.randn(content_nst.size(), device=DEVICE, dtype=content_nst.dtype) * 1e-3).contiguous()
+    opt_img = content_nst.clone()
+    #opt_img = (torch.randn(content_nst.size(), device=DEVICE, dtype=content_nst.dtype) * 1e-3).contiguous()
     opt_img.requires_grad_(True)
     optimizer = optim.LBFGS([opt_img])
 

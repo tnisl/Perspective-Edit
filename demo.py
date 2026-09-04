@@ -25,9 +25,9 @@ def extract_materials(editor_data):
     cv2.imwrite('materials/portrait.png', cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR))
 
 
-def run(editor_data, style_img,  azimuth, elevation, iters):
+def export_3d(editor_data):
     extract_materials(editor_data)
-    cv2.imwrite('materials/style_img.png', cv2.cvtColor(style_img, cv2.COLOR_RGB2BGR))
+
     subprocess.run([".venv/bin/python",
                     "3d_scripts/inference_triposg.py",
                     "--image-input", "materials/portrait.png",
@@ -37,6 +37,15 @@ def run(editor_data, style_img,  azimuth, elevation, iters):
                    "--img_path", "materials/portrait.png",
                    "--mesh_path", "materials/object.glb",
                    "--output_path", "materials"])
+
+    return "materials/mvadapter_model_result.glb"
+
+
+
+
+def run(editor_data, style_img,  azimuth, elevation, iters):
+    extract_materials(editor_data)
+    cv2.imwrite('materials/style_img.png', cv2.cvtColor(style_img, cv2.COLOR_RGB2BGR))
     subprocess.run([".venv/bin/python",
                    "run_rotation.py",
                    "--mesh_path", "materials/mvadapter_model_result.glb",
@@ -47,15 +56,23 @@ def run(editor_data, style_img,  azimuth, elevation, iters):
                     "--img_path", "materials/portrait.png",
                     "--rotated_img_path", "materials/rotated_img.png",
                     "--mask_path", "materials/mask.png"])
-    subprocess.run([".venv/bin/python", "blending/run_style_transfer.py",
-                    "--source_path", "materials/moved_content_mask.png",
-                    "--target_path", "materials/portrait.png", 
-                    "--mask_path", "materials/mask.png",
-                    "--style_path", "materials/style_img.png", 
-                    "--iters", f"{iters}"])
-    result=cv2.imread('result.png')
+   # blending + style transfer
+   # subprocess.run([".venv/bin/python", "blending/run_blending_style_transfer.py",
+   #                 "--source_path", "materials/moved_content_mask.png",
+   #                 "--target_path", "materials/portrait.png", 
+   #                 "--mask_path", "materials/mask.png",
+   #                 "--style_path", "materials/style_img.png", 
+   #                 "--iters", f"{iters}"])
 
-    return cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
+    # style transfer only
+    # subprocess.run([".venv/bin/python", "blending/run_style_transfer.py",
+    #                 "--blend_path", "materials/poisson_blending_result.png",
+    #                 "--style_path", "materials/style_img.png", 
+    #                 "--iters", f"{iters}"])
+
+    # result=cv2.imread('result.png')
+
+    # return cv2.cvtColor(result, cv2.COLOR_BGR2RGB)
 
 with gr.Blocks() as demo:
     gr.Markdown("Perspective Edit")
@@ -75,6 +92,7 @@ with gr.Blocks() as demo:
                     type="numpy",
                     sources=["upload", "clipboard"]
                 )
+            btn_export3d = gr.Button("Export 3D", variant="primary")
             btn_submit = gr.Button("Run", variant="primary")
 
             with gr.Column():
@@ -103,8 +121,14 @@ with gr.Blocks() as demo:
 
             
         with gr.Column():
+            object_3d = gr.Model3D(label="3D portrait", clear_color=[0.8, 0.8, 0.8, 1.0])
             output = gr.Image(label="Result")
             
+    btn_export3d.click(
+        fn=export_3d,
+        inputs=[input_editor],
+        outputs=[object_3d]
+    )
     btn_submit.click(
         fn=run, 
         inputs=[input_editor, style_img, azimuth, elevation, iters], 

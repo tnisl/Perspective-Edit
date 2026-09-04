@@ -69,7 +69,7 @@ def run_texturing(img_path, mesh_path, output_path):
         dtype=torch.float16,
     )
     
-    mv_adapter_pipe.enable_vae_tiling()
+    mv_adapter_pipe.vae.enable_tiling()
     
     
     mv_adapter_pipe.unet.to("cuda:1")
